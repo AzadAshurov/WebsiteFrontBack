@@ -4,6 +4,6 @@ namespace WebApplication1.ViewModels
 {
     public class HomeVM
     {
-        public List<Slide> Slides { get; set; }
+        public List<Slide> Slides { get; set; } = new List<Slide>();
     }
 }

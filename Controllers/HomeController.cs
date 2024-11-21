@@ -43,7 +43,7 @@ namespace WebApplication1.Controllers
             {
                 Slides = slides
             };
-            return View();
+            return View(homeVM);
         }
     }
 }
