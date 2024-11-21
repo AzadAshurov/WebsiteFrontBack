@@ -6,7 +6,7 @@
     <!-- Main Slider -->
     <div class="swiper-container main-slider swiper-arrow with-bg_white">
         <div class="swiper-wrapper">
-           @foreach (Slide item in Model.Slides )
+           @foreach (Slide slide in Model.Slides )
             {
                 <div class="swiper-slide animation-style-01">
                     <div class="slide-inner style-1 bg-height"
@@ -15,10 +15,10 @@
                             <div class="row">
                                 <div class="col-lg-6 order-2 order-lg-1 align-self-center">
                                     <div class="slide-content text-black">
-                                        <span class="offer">65% Off</span>
-                                        <h2 class="title">New Plant</h2>
+                                        <span class="offer">@slide.SubTitle</span>
+                                        <h2 class="title">@slide.Title</h2>
                                         <p class="short-desc">
-                                            Pronia, With 100% Natural, Organic & Plant Shop.
+                                           @slide.Description
                                         </p>
                                         <div class="btn-wrap">
                                             <a class="btn btn-custom-size xl-size btn-pronia-primary"
@@ -30,7 +30,7 @@
                                     <div class="inner-img">
                                         <div class="scene fill">
                                             <div class="expand-width" data-depth="0.2">
-                                                <img src="~/assets/images/website-images//1-1-524x617.png"
+                                                <img src="~/assets/images/website-images//@slide.Image"
                                                      alt="Inner Image" />
                                             </div>
                                         </div>

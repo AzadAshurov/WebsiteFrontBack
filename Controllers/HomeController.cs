@@ -41,7 +41,8 @@ namespace WebApplication1.Controllers
 
             HomeVM homeVM = new HomeVM
             {
-                Slides = slides
+                //i want all 3 slides to be on
+                Slides = slides.OrderBy(x => x.Order).Take(3).ToList()
             };
             return View(homeVM);
         }
