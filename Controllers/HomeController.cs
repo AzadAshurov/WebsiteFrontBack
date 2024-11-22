@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using WebApplication1.DAL;
 using WebApplication1.ViewModels;
 
@@ -15,6 +16,7 @@ namespace WebApplication1.Controllers
 
         public IActionResult Index(int id)
         {
+
             //List<Slide> slides = new List<Slide>
             //{
             //    new Slide
@@ -57,7 +59,8 @@ namespace WebApplication1.Controllers
             HomeVM homeVM = new HomeVM
             {
                 //i want all 3 slides to be on
-                Slides = _context.Slides.OrderBy(x => x.Order).Take(3).ToList()
+                Slides = _context.Slides.OrderBy(x => x.Order).Take(3).ToList(),
+                Products = _context.Products.Include(p => p.ProductImages).ToList()
             };
             return View(homeVM);
         }
