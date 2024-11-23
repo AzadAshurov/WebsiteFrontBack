@@ -5,6 +5,6 @@
 
 		public string Name { get; set; }
 		//relation
-		public Product Product { get; set; }
+		public List<Product> Product { get; set; }
 	}
 }
