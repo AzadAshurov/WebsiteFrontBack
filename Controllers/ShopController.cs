@@ -33,9 +33,10 @@ namespace WebApplication1.Controllers
             {
                 Products = product,
                 RelatedProducts = _context.Products
-                    .Where(p => p.CategoryId == product.CategoryId && p.Id != id)
+                  .Where(p => p.CategoryId == product.CategoryId && p.Id != id)
                     .Include(p => p.ProductImages.Where(pi => pi.IsPrimary != null))
                     .ToList()
+
             };
 
             return View(detailVM);
