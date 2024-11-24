@@ -14,10 +14,10 @@ namespace WebApplication1.Controllers
             _context = context;
         }
 
-        public IActionResult Index(int id)
+        public async Task<IActionResult> Index(int id)
         {
-            var slides = _context.Slides.OrderBy(x => x.Order).Take(3).ToList();
-            var products = _context.Products.Include(p => p.ProductImages.Where(pi => pi.IsPrimary != null)).ToList();
+            var slides = await _context.Slides.OrderBy(x => x.Order).Take(3).ToListAsync();
+            var products = await _context.Products.Include(p => p.ProductImages.Where(pi => pi.IsPrimary != null)).ToListAsync();
 
             Console.WriteLine($"Slides count: {slides.Count}");
             Console.WriteLine($"Products count: {products.Count}");
