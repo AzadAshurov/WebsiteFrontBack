@@ -19,5 +19,9 @@ namespace WebApplication1.Areas.Admin.Controllers
             List<Category> categories = await _context.Category.Include(x => x.Product).ToListAsync();
             return View(categories);
         }
+        public IActionResult Create()
+        {
+            return View();
+        }
     }
 }
