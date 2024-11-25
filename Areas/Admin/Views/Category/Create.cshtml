@@ -1,17 +1,29 @@
-﻿<div class="col-md-6 grid-margin stretch-card">
-    <div class="card">
-        <div class="card-body">
-            <h4 class="card-title">Creating category</h4>
-          
-            <form class="forms-sample">
-                <div class="form-group">
-                    <label for="exampleInputUsername1">Name</label>
-                    <input type="text" class="form-control" id="exampleInputUsername1" placeholder="Enter category ">
-                </div>            
-               
-                <button type="submit" class="btn btn-primary me-2">Submit</button>
-                <button class="btn btn-light">Cancel</button>
-            </form>
+﻿@model Category
+
+
+<h1>AAAA</h1>
+<div class="row">
+
+    <div class="col-12 grid-margin stretch-card">
+        <div class="card">
+            <div class="card-body">
+                <h4 class="card-title">Create Category</h4>
+
+                <form class="forms-sample" asp-area="Admin" asp-controller="Category" asp-action="Create" method="post">
+                    <div class="form-group">
+                        <label for="Name" class="form-label">Name</label>
+                        <input asp-for="Name" class="form-control" placeholder="Name">
+
+
+                        <span asp-validation-for="Name" class="text-danger"></span>
+                    </div>
+
+
+                    <button type="submit" class="btn btn-primary me-2">Create</button>
+                    <button class="btn btn-light">Cancel</button>
+                </form>
+            </div>
         </div>
     </div>
+
 </div>

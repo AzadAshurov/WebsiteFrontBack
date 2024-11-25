@@ -9,5 +9,10 @@ namespace WebApplication1.Areas.Admin.Controllers
         {
             return View();
         }
+        [HttpPost]
+        public IActionResult Index(string name)
+        {
+            return View();
+        }
     }
 }
