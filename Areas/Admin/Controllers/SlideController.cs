@@ -18,5 +18,10 @@ namespace WebApplication1.Areas.Admin.Controllers
             List<Slide> slides = _context.Slides.ToList();
             return View(slides);
         }
+        public async Task<IActionResult> Create()
+        {
+
+            return View();
+        }
     }
 }
