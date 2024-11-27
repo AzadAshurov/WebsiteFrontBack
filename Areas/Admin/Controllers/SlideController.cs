@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using WebApplication1.DAL;
 using WebApplication1.Models;
+using WebApplication1.Utilities.Extensions;
 
 namespace WebApplication1.Areas.Admin.Controllers
 {
@@ -8,10 +9,12 @@ namespace WebApplication1.Areas.Admin.Controllers
     public class SlideController : Controller
     {
         private readonly AppDbContext _context;
+        private readonly IWebHostEnvironment _env;
 
-        public SlideController(AppDbContext context)
+        public SlideController(AppDbContext context, IWebHostEnvironment env)
         {
             _context = context;
+            _env = env;
         }
         public IActionResult Index()
         {
@@ -22,6 +25,29 @@ namespace WebApplication1.Areas.Admin.Controllers
         {
 
             return View();
+        }
+        [HttpPost]
+        public async Task<IActionResult> Create(Slide slide)
+        {
+            //if (!ModelState.IsValid) return View();
+
+            if (!slide.Photo.IsFileTypeValid("image/"))
+            {
+                ModelState.AddModelError("Photo", "File type is incorrect");
+                return View();
+            }
+            if (!slide.Photo.IsFileSizeValid(Utilities.Enums.FileSize.Megabyte, 2))
+            {
+                ModelState.AddModelError("Photo", "File size must be less than 2 mb");
+                return View();
+            }
+
+            slide.Image = await slide.Photo.CreateFileAsync(_env.WebRootPath, "assets", "images", "website-images");
+
+            await _context.Slides.AddAsync(slide);
+            await _context.SaveChangesAsync();
+
+            return RedirectToAction(nameof(Index));
         }
     }
 }
