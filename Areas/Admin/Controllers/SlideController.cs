@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using WebApplication1.DAL;
 using WebApplication1.Models;
 using WebApplication1.Utilities.Extensions;
@@ -29,7 +30,7 @@ namespace WebApplication1.Areas.Admin.Controllers
         [HttpPost]
         public async Task<IActionResult> Create(Slide slide)
         {
-            //if (!ModelState.IsValid) return View();
+            // if (!ModelState.IsValid) return View();
 
             if (!slide.Photo.IsFileTypeValid("image/"))
             {
@@ -45,6 +46,20 @@ namespace WebApplication1.Areas.Admin.Controllers
             slide.Image = await slide.Photo.CreateFileAsync(_env.WebRootPath, "assets", "images", "website-images");
 
             await _context.Slides.AddAsync(slide);
+            await _context.SaveChangesAsync();
+
+            return RedirectToAction(nameof(Index));
+        }
+        public async Task<IActionResult> Delete(int? id)
+        {
+            if (id == null || id < 1) { return BadRequest(); }
+
+            Slide slide = await _context.Slides.FirstOrDefaultAsync(s => s.Id == id);
+
+            if (slide == null) { return NotFound(); }
+
+            slide.Image.DeleteFile(_env.WebRootPath, "assets", "images", "website-images");
+            _context.Slides.Remove(slide);
             await _context.SaveChangesAsync();
 
             return RedirectToAction(nameof(Index));

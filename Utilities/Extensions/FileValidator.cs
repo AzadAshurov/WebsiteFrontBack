@@ -14,12 +14,15 @@ namespace WebApplication1.Utilities.Extensions
         }
         public static bool IsFileSizeValid(this IFormFile formFile, FileSize sizeType, int size)
         {
-            if (formFile.Length * 8 > Math.Pow(size, (int)Enum.Parse(typeof(FileSize), sizeType.ToString(), true)))
+
+            long maxSizeInBytes = size * (long)Math.Pow(2, (int)sizeType - 3);
+            if (formFile.Length > maxSizeInBytes)
             {
                 return false;
             }
             return true;
         }
+
         public static async Task<string> CreateFileAsync(this IFormFile file, params string[] roots)
         {
             string fileName = string.Concat(Guid.NewGuid().ToString(), file.FileName);
@@ -38,7 +41,28 @@ namespace WebApplication1.Utilities.Extensions
 
             return fileName;
         }
+        public static void DeleteFile(this string filename, params string[] roots)
+        {
+            string path = CreatePath(filename, roots);
 
+
+            if (File.Exists(path))
+            {
+                File.Delete(path);
+            }
+
+        }
+        private static string CreatePath(string filename, params string[] roots)
+        {
+            string path = string.Empty;
+
+            for (int i = 0; i < roots.Length; i++)
+            {
+                path = Path.Combine(path, roots[i]);
+            }
+
+            return path = Path.Combine(path, filename);
+        }
 
 
     }
