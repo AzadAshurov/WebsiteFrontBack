@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using WebApplication1.Areas.Admin.ViewModels.Products;
 using WebApplication1.DAL;
 
 namespace WebApplication1.Areas.Admin.Controllers
@@ -33,5 +34,33 @@ namespace WebApplication1.Areas.Admin.Controllers
 
             return View(productsVMs);
         }
+        public async Task<IActionResult> Create()
+        {
+            CreateProductVM productVM = new CreateProductVM
+            {
+                Categories = await _context.Category.ToListAsync()
+            };
+            return View(productVM);
+        }
+        [HttpPost]
+        public async Task<IActionResult> Create(CreateProductVM productVM)
+        {
+            productVM.Categories = await _context.Category.ToListAsync();
+
+            if (!ModelState.IsValid)
+            {
+                return View(productVM);
+            }
+
+            bool result = productVM.Categories.Any(c => c.Id == productVM.CategoryId);
+            if (!result)
+            {
+                ModelState.AddModelError(nameof(CreateProductVM.CategoryId), "No such category,please select");
+                return View(productVM);
+            }
+
+            return RedirectToAction("Index");
+        }
+
     }
 }
