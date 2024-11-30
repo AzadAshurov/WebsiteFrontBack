@@ -1,7 +1,9 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using WebApplication1.Areas.Admin.ViewModels;
 using WebApplication1.Areas.Admin.ViewModels.Products;
 using WebApplication1.DAL;
+using WebApplication1.Models;
 
 namespace WebApplication1.Areas.Admin.Controllers
 {
@@ -58,8 +60,71 @@ namespace WebApplication1.Areas.Admin.Controllers
                 ModelState.AddModelError(nameof(CreateProductVM.CategoryId), "No such category,please select");
                 return View(productVM);
             }
-
+            Product product = new()
+            {
+                Name = productVM.Name,
+                SKU = productVM.SKU,
+                CategoryId = productVM.CategoryId.Value,
+                Description = productVM.Description,
+                Price = productVM.Price.Value,
+                CreatedAt = DateTime.Now,
+                IsDeleted = false,
+            };
+            await _context.Products.AddAsync(product);
+            await _context.SaveChangesAsync();
             return RedirectToAction("Index");
+        }
+        public async Task<IActionResult> Update(int? id)
+        {
+            if (id == null || id < 1) return BadRequest();
+
+
+            Product product = await _context.Products.FirstOrDefaultAsync(s => s.Id == id);
+
+            if (product is null) return NotFound();
+
+            UpdateProductVM updateProductVM = new()
+            {
+                Name = product.Name,
+                SKU = product.SKU,
+                Price = product.Price,
+                Description = product.Description,
+                CategoryId = product.CategoryId,
+                Categories = _context.Category.ToList(),
+            };
+
+            return View(updateProductVM);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> Update(int? id, UpdateProductVM productVM)
+        {
+            if (id == null || id < 1) return BadRequest();
+            if (!ModelState.IsValid)
+            {
+                return View(productVM);
+            }
+
+            Product productFromSQL = await _context.Products.FirstOrDefaultAsync(s => s.Id == id);
+
+            if (productFromSQL is null) return NotFound();
+            productVM.Categories = await _context.Category.ToListAsync();
+
+            if (productFromSQL.CategoryId != productVM.CategoryId)
+            {
+                if (!productVM.Categories.Any(x => x.Id == productFromSQL.CategoryId))
+                {
+                    return View(productVM);
+                }
+            }
+            productFromSQL.SKU = productVM.SKU;
+            productFromSQL.Price = productVM.Price.Value;
+            productFromSQL.CategoryId = productVM.CategoryId.Value;
+            productFromSQL.Name = productVM.Name;
+            productFromSQL.Description = productVM.Description;
+            await _context.SaveChangesAsync();
+            return RedirectToAction("Index");
+
         }
 
     }
