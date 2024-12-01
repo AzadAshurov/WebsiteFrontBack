@@ -79,6 +79,11 @@ namespace WebApplication1.Areas.Admin.Controllers
             }
             Tag tag = await _context.Tags.FirstOrDefaultAsync(s => s.Id == id);
             if (tag is null) return NotFound();
+            if (_context.Tags.Any(x => x.Name == tagVM.Name && x.Id != tagVM.Id))
+            {
+                ModelState.AddModelError(nameof(UpdateTagVM.Name), "Tag must be unique");
+                return View(tagVM);
+            }
             tag.Name = tagVM.Name;
             await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
@@ -94,5 +99,6 @@ namespace WebApplication1.Areas.Admin.Controllers
             await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
         }
+
     }
 }
