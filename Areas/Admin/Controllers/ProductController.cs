@@ -40,7 +40,8 @@ namespace WebApplication1.Areas.Admin.Controllers
         {
             CreateProductVM productVM = new CreateProductVM
             {
-                Categories = await _context.Category.ToListAsync()
+                Categories = await _context.Category.ToListAsync(),
+                Tags = await _context.Tags.ToListAsync()
             };
             return View(productVM);
         }
@@ -48,7 +49,7 @@ namespace WebApplication1.Areas.Admin.Controllers
         public async Task<IActionResult> Create(CreateProductVM productVM)
         {
             productVM.Categories = await _context.Category.ToListAsync();
-
+            productVM.Tags = await _context.Tags.ToListAsync();
             if (!ModelState.IsValid)
             {
                 return View(productVM);
@@ -60,6 +61,15 @@ namespace WebApplication1.Areas.Admin.Controllers
                 ModelState.AddModelError(nameof(CreateProductVM.CategoryId), "No such category,please select");
                 return View(productVM);
             }
+            if (productVM.TagIds is not null)
+            {
+                bool tagResult = productVM.TagIds.Any(x => !productVM.Tags.Exists(xx => xx.Id == x));
+                if (tagResult)
+                {
+                    ModelState.AddModelError(nameof(CreateProductVM.TagIds), "Tags were wrong");
+                    return View(productVM);
+                }
+            }
             Product product = new()
             {
                 Name = productVM.Name,
@@ -68,8 +78,12 @@ namespace WebApplication1.Areas.Admin.Controllers
                 Description = productVM.Description,
                 Price = productVM.Price.Value,
                 CreatedAt = DateTime.Now,
-                IsDeleted = false,
+                IsDeleted = false
             };
+            if (productVM.TagIds is not null)
+            {
+                product.ProductTags = productVM.TagIds.Select(x => new ProductTag { TagId = x }).ToList();
+            }
             await _context.Products.AddAsync(product);
             await _context.SaveChangesAsync();
             return RedirectToAction("Index");
@@ -79,7 +93,7 @@ namespace WebApplication1.Areas.Admin.Controllers
             if (id == null || id < 1) return BadRequest();
 
 
-            Product product = await _context.Products.FirstOrDefaultAsync(s => s.Id == id);
+            Product product = await _context.Products.Include(t => t.ProductTags).FirstOrDefaultAsync(s => s.Id == id);
 
             if (product is null) return NotFound();
 
@@ -91,6 +105,8 @@ namespace WebApplication1.Areas.Admin.Controllers
                 Description = product.Description,
                 CategoryId = product.CategoryId,
                 Categories = _context.Category.ToList(),
+                TagIds = product.ProductTags.Select(x => x.TagId).ToList(),
+                Tags = _context.Tags.ToList()
             };
 
             return View(updateProductVM);

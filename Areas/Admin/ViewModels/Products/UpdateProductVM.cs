@@ -13,5 +13,7 @@ namespace WebApplication1.Areas.Admin.ViewModels
         [Required(ErrorMessage = "PLEASE SELECT CATEGORY")]
         public int? CategoryId { get; set; }
         public List<Category>? Categories { get; set; }
+        public List<Tag>? Tags { get; set; }
+        public List<int>? TagIds { get; set; }
     }
 }
