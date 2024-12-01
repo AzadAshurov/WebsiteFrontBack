@@ -83,5 +83,16 @@ namespace WebApplication1.Areas.Admin.Controllers
             await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
         }
+        public async Task<IActionResult> Delete(int? id)
+        {
+            if (id == null || id < 1) return BadRequest();
+
+            Tag tag = await _context.Tags.FirstOrDefaultAsync(c => c.Id == id);
+
+            if (tag is null) return NotFound();
+            _context.Tags.Remove(tag);
+            await _context.SaveChangesAsync();
+            return RedirectToAction(nameof(Index));
+        }
     }
 }
