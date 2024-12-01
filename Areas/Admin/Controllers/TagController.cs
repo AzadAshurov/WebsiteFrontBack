@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using WebApplication1.Areas.Admin.ViewModels;
+using WebApplication1.Areas.Admin.ViewModels.Tags;
 using WebApplication1.DAL;
 using WebApplication1.Models;
 
@@ -51,6 +52,36 @@ namespace WebApplication1.Areas.Admin.Controllers
             return RedirectToAction(nameof(Index));
         }
 
+        public async Task<IActionResult> Update(int? id)
+        {
+            if (id == null || id < 1) return BadRequest();
 
+            if (!ModelState.IsValid)
+            {
+                return View();
+            }
+            Tag tag = await _context.Tags.FirstOrDefaultAsync(s => s.Id == id);
+            if (tag is null) return NotFound();
+            UpdateTagVM tagVM = new UpdateTagVM
+            {
+                Name = tag.Name
+            };
+            return View(tagVM);
+        }
+        [HttpPost]
+        public async Task<IActionResult> Update(int? id, UpdateTagVM tagVM)
+        {
+            if (id == null || id < 1) return BadRequest();
+
+            if (!ModelState.IsValid)
+            {
+                return View();
+            }
+            Tag tag = await _context.Tags.FirstOrDefaultAsync(s => s.Id == id);
+            if (tag is null) return NotFound();
+            tag.Name = tagVM.Name;
+            await _context.SaveChangesAsync();
+            return RedirectToAction(nameof(Index));
+        }
     }
 }
