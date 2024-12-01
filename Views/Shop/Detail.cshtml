@@ -197,7 +197,16 @@
                                 </li>                        
                             </ul>
                         </div>
-                        
+                        <div class="product-category">
+                            <span class="title">Tags :</span>
+                            <ul>
+                                @foreach(ProductTag productTag in Model.Products.ProductTags){
+                                <li>
+                                    <a href="#">@productTag.Tag.Name</a>
+                                </li>
+                                }
+                            </ul>
+                        </div>
                         <div class="product-category social-link align-items-center pb-0">
                             <span class="title pe-3">Share:</span>
                             <ul>
