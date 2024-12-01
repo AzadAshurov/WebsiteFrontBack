@@ -120,11 +120,11 @@ namespace WebApplication1.Areas.Admin.Controllers
                 return View(productVM);
             }
 
-            Product productFromSQL = await _context.Products.FirstOrDefaultAsync(s => s.Id == id);
+            Product productFromSQL = await _context.Products.Include(x => x.ProductTags).FirstOrDefaultAsync(s => s.Id == id);
 
             if (productFromSQL is null) return NotFound();
             productVM.Categories = await _context.Category.ToListAsync();
-
+            productVM.Tags = await _context.Tags.ToListAsync();
             if (productFromSQL.CategoryId != productVM.CategoryId)
             {
                 if (!productVM.Categories.Any(x => x.Id == productFromSQL.CategoryId))
@@ -132,6 +132,26 @@ namespace WebApplication1.Areas.Admin.Controllers
                     return View(productVM);
                 }
             }
+
+            if (productVM.TagIds is not null)
+            {
+                bool tagResult = productVM.TagIds.Any(x => !_context.Tags.Any(xx => xx.Id == x));
+                if (tagResult)
+                {
+                    ModelState.AddModelError(nameof(UpdateProductVM.TagIds), "Tags were wrong");
+                    return View(productVM);
+                }
+            }
+            else
+            {
+                productVM.TagIds = new();
+            }
+
+
+            _context.ProductTags.RemoveRange(productFromSQL.ProductTags.Where(x => !productVM.TagIds.Exists(xr => xr == x.TagId)));
+            //List<int> addTags = productVM.TagIds.Where(x => !productFromSQL.ProductTags.Exists(xd => xd.TagId == x)).ToList();
+            _context.ProductTags.AddRange(productVM.TagIds.Where(x => !productFromSQL.ProductTags.Exists(xd => xd.TagId == x)).ToList().Select(xz => new ProductTag { TagId = xz, ProductId = productFromSQL.Id }));
+
             productFromSQL.SKU = productVM.SKU;
             productFromSQL.Price = productVM.Price.Value;
             productFromSQL.CategoryId = productVM.CategoryId.Value;
