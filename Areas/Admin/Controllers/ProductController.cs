@@ -92,7 +92,6 @@ namespace WebApplication1.Areas.Admin.Controllers
         {
             if (id == null || id < 1) return BadRequest();
 
-
             Product product = await _context.Products.Include(t => t.ProductTags).FirstOrDefaultAsync(s => s.Id == id);
 
             if (product is null) return NotFound();
