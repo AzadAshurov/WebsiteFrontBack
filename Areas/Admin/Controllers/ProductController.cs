@@ -4,6 +4,8 @@ using WebApplication1.Areas.Admin.ViewModels;
 using WebApplication1.Areas.Admin.ViewModels.Products;
 using WebApplication1.DAL;
 using WebApplication1.Models;
+using WebApplication1.Utilities.Enums;
+using WebApplication1.Utilities.Extensions;
 
 namespace WebApplication1.Areas.Admin.Controllers
 {
@@ -70,6 +72,40 @@ namespace WebApplication1.Areas.Admin.Controllers
                     return View(productVM);
                 }
             }
+            if (!productVM.MainPhoto.IsFileTypeValid("image/"))
+            {
+                ModelState.AddModelError(nameof(productVM.MainPhoto), "File format is incorrect");
+                return View(productVM);
+            }
+            if (!productVM.MainPhoto.IsFileSizeValid(FileSize.Megabyte, 2))
+            {
+                ModelState.AddModelError(nameof(productVM.MainPhoto), "Size of file must be below 2 mb");
+                return View(productVM);
+            }
+            if (!productVM.HoverPhoto.IsFileTypeValid("image/"))
+            {
+                ModelState.AddModelError(nameof(productVM.HoverPhoto), "File format is incorrect");
+                return View(productVM);
+            }
+            if (!productVM.HoverPhoto.IsFileSizeValid(FileSize.Megabyte, 2))
+            {
+                ModelState.AddModelError(nameof(productVM.HoverPhoto), "Size of file must be below 2 mb");
+                return View(productVM);
+            }
+            ProductImage mainImage = new()
+            {
+                Image = await productVM.MainPhoto.CreateFileAsync(_env.WebRootPath, "assets", "images", "website-images"),
+                IsPrimary = true,
+                CreatedAt = DateTime.Now,
+                IsDeleted = false
+            };
+            ProductImage hoverImage = new()
+            {
+                Image = await productVM.HoverPhoto.CreateFileAsync(_env.WebRootPath, "assets", "images", "website-images"),
+                IsPrimary = false,
+                CreatedAt = DateTime.Now,
+                IsDeleted = false
+            };
             Product product = new()
             {
                 Name = productVM.Name,
@@ -78,7 +114,11 @@ namespace WebApplication1.Areas.Admin.Controllers
                 Description = productVM.Description,
                 Price = productVM.Price.Value,
                 CreatedAt = DateTime.Now,
-                IsDeleted = false
+                IsDeleted = false,
+                ProductImages = new List<ProductImage>
+                {
+                    mainImage, hoverImage
+                }
             };
             if (productVM.TagIds is not null)
             {
@@ -123,6 +163,11 @@ namespace WebApplication1.Areas.Admin.Controllers
             Product productFromSQL = await _context.Products.Include(x => x.ProductTags).FirstOrDefaultAsync(s => s.Id == id);
 
             if (productFromSQL is null) return NotFound();
+
+
+
+
+
             productVM.Categories = await _context.Category.ToListAsync();
             productVM.Tags = await _context.Tags.ToListAsync();
             if (productFromSQL.CategoryId != productVM.CategoryId)

@@ -5,6 +5,11 @@ namespace WebApplication1.Areas.Admin.ViewModels.Products
 {
     public class CreateProductVM
     {
+        public IFormFile MainPhoto { get; set; }
+
+        public IFormFile HoverPhoto { get; set; }
+
+        public List<IFormFile>? SidePhotos { get; set; }
         public string Name { get; set; }
         [Required]
         public decimal? Price { get; set; }
