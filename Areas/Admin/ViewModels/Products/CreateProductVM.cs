@@ -9,7 +9,7 @@ namespace WebApplication1.Areas.Admin.ViewModels.Products
 
         public IFormFile HoverPhoto { get; set; }
 
-        public List<IFormFile>? SidePhotos { get; set; }
+        public List<IFormFile>? AdditionalPhotos { get; set; }
         public string Name { get; set; }
         [Required]
         public decimal? Price { get; set; }

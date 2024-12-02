@@ -155,6 +155,30 @@ namespace WebApplication1.Areas.Admin.Controllers
             {
                 product.ProductSizes = productVM.SizeIds.Select(x => new ProductSize { SizeId = x }).ToList();
             }
+            string text = string.Empty;
+
+            foreach (IFormFile file in productVM.AdditionalPhotos)
+            {
+                if (!file.IsFileTypeValid("image/"))
+                {
+                    text += $"<p class=\"text-warning\">{file.FileName} type was not correct</p>";
+                    continue;
+                }
+
+                if (!file.IsFileSizeValid(FileSize.Megabyte, 1))
+                {
+                    text += $"<p class=\"text-warning\">{file.FileName} size was not correct</p>";
+                    continue;
+                }
+                product.ProductImages.Add(new ProductImage
+                {
+                    Image = await file.CreateFileAsync(_env.WebRootPath, "assets", "images", "website-images"),
+                    CreatedAt = DateTime.Now,
+                    IsDeleted = false,
+                    IsPrimary = null
+                });
+            }
+            TempData["FileWarning"] = text;
             await _context.Products.AddAsync(product);
             await _context.SaveChangesAsync();
             return RedirectToAction("Index");
