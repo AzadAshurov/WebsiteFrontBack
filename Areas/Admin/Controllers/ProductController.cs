@@ -43,7 +43,9 @@ namespace WebApplication1.Areas.Admin.Controllers
             CreateProductVM productVM = new CreateProductVM
             {
                 Categories = await _context.Category.ToListAsync(),
-                Tags = await _context.Tags.ToListAsync()
+                Tags = await _context.Tags.ToListAsync(),
+                Sizes = await _context.Sizes.ToListAsync(),
+                Colors = await _context.Colors.ToListAsync()
             };
             return View(productVM);
         }
@@ -52,6 +54,8 @@ namespace WebApplication1.Areas.Admin.Controllers
         {
             productVM.Categories = await _context.Category.ToListAsync();
             productVM.Tags = await _context.Tags.ToListAsync();
+            productVM.Colors = await _context.Colors.ToListAsync();
+            productVM.Sizes = await _context.Sizes.ToListAsync();
             if (!ModelState.IsValid)
             {
                 return View(productVM);
@@ -68,7 +72,25 @@ namespace WebApplication1.Areas.Admin.Controllers
                 bool tagResult = productVM.TagIds.Any(x => !productVM.Tags.Exists(xx => xx.Id == x));
                 if (tagResult)
                 {
-                    ModelState.AddModelError(nameof(CreateProductVM.TagIds), "Tags were wrong");
+                    ModelState.AddModelError(nameof(CreateProductVM.TagIds), "Tags are wrong");
+                    return View(productVM);
+                }
+            }
+            if (productVM.SizeIds is not null)
+            {
+                bool sizeResult = productVM.SizeIds.Any(x => !productVM.Sizes.Exists(xx => xx.Id == x));
+                if (sizeResult)
+                {
+                    ModelState.AddModelError(nameof(CreateProductVM.SizeIds), "Sizes are wrong");
+                    return View(productVM);
+                }
+            }
+            if (productVM.ColorIds is not null)
+            {
+                bool colorResult = productVM.ColorIds.Any(x => !productVM.Colors.Exists(xx => xx.Id == x));
+                if (colorResult)
+                {
+                    ModelState.AddModelError(nameof(CreateProductVM.ColorIds), "Colors are wrong");
                     return View(productVM);
                 }
             }
@@ -92,6 +114,7 @@ namespace WebApplication1.Areas.Admin.Controllers
                 ModelState.AddModelError(nameof(productVM.HoverPhoto), "Size of file must be below 2 mb");
                 return View(productVM);
             }
+
             ProductImage mainImage = new()
             {
                 Image = await productVM.MainPhoto.CreateFileAsync(_env.WebRootPath, "assets", "images", "website-images"),
@@ -124,6 +147,14 @@ namespace WebApplication1.Areas.Admin.Controllers
             {
                 product.ProductTags = productVM.TagIds.Select(x => new ProductTag { TagId = x }).ToList();
             }
+            if (productVM.ColorIds is not null)
+            {
+                product.ProductColors = productVM.ColorIds.Select(x => new ProductColor { ColorId = x }).ToList();
+            }
+            if (productVM.SizeIds is not null)
+            {
+                product.ProductSizes = productVM.SizeIds.Select(x => new ProductSize { SizeId = x }).ToList();
+            }
             await _context.Products.AddAsync(product);
             await _context.SaveChangesAsync();
             return RedirectToAction("Index");
@@ -132,7 +163,7 @@ namespace WebApplication1.Areas.Admin.Controllers
         {
             if (id == null || id < 1) return BadRequest();
 
-            Product product = await _context.Products.Include(t => t.ProductTags).FirstOrDefaultAsync(s => s.Id == id);
+            Product product = await _context.Products.Include(t => t.ProductSizes).Include(t => t.ProductColors).Include(t => t.ProductTags).FirstOrDefaultAsync(s => s.Id == id);
 
             if (product is null) return NotFound();
 
@@ -145,7 +176,11 @@ namespace WebApplication1.Areas.Admin.Controllers
                 CategoryId = product.CategoryId,
                 Categories = _context.Category.ToList(),
                 TagIds = product.ProductTags.Select(x => x.TagId).ToList(),
-                Tags = _context.Tags.ToList()
+                Tags = _context.Tags.ToList(),
+                ColorIds = product.ProductColors.Select(x => x.ColorId).ToList(),
+                Colors = _context.Colors.ToList(),
+                SizeIds = product.ProductSizes.Select(x => x.SizeId).ToList(),
+                Sizes = _context.Sizes.ToList()
             };
 
             return View(updateProductVM);
@@ -160,7 +195,7 @@ namespace WebApplication1.Areas.Admin.Controllers
                 return View(productVM);
             }
 
-            Product productFromSQL = await _context.Products.Include(x => x.ProductTags).FirstOrDefaultAsync(s => s.Id == id);
+            Product productFromSQL = await _context.Products.Include(x => x.ProductColors).Include(x => x.ProductSizes).Include(x => x.ProductTags).FirstOrDefaultAsync(s => s.Id == id);
 
             if (productFromSQL is null) return NotFound();
 
@@ -170,6 +205,8 @@ namespace WebApplication1.Areas.Admin.Controllers
 
             productVM.Categories = await _context.Category.ToListAsync();
             productVM.Tags = await _context.Tags.ToListAsync();
+            productVM.Sizes = await _context.Sizes.ToListAsync();
+            productVM.Colors = await _context.Colors.ToListAsync();
             if (productFromSQL.CategoryId != productVM.CategoryId)
             {
                 if (!productVM.Categories.Any(x => x.Id == productFromSQL.CategoryId))
@@ -180,10 +217,10 @@ namespace WebApplication1.Areas.Admin.Controllers
 
             if (productVM.TagIds is not null)
             {
-                bool tagResult = productVM.TagIds.Any(x => !_context.Tags.Any(xx => xx.Id == x));
+                bool tagResult = productVM.TagIds.Any(x => !productVM.Tags.Any(xx => xx.Id == x));
                 if (tagResult)
                 {
-                    ModelState.AddModelError(nameof(UpdateProductVM.TagIds), "Tags were wrong");
+                    ModelState.AddModelError(nameof(UpdateProductVM.TagIds), "Tags are incorrect");
                     return View(productVM);
                 }
             }
@@ -191,6 +228,38 @@ namespace WebApplication1.Areas.Admin.Controllers
             {
                 productVM.TagIds = new();
             }
+            if (productVM.ColorIds is not null)
+            {
+                bool colorResult = productVM.ColorIds.Any(x => !productVM.Colors.Any(xx => xx.Id == x));
+                if (colorResult)
+                {
+                    ModelState.AddModelError(nameof(UpdateProductVM.ColorIds), "Colors are incorrect");
+                    return View(productVM);
+                }
+            }
+            else
+            {
+                productVM.ColorIds = new();
+            }
+            if (productVM.SizeIds is not null)
+            {
+                bool sizeResult = productVM.SizeIds.Any(x => !productVM.Sizes.Any(xx => xx.Id == x));
+                if (sizeResult)
+                {
+                    ModelState.AddModelError(nameof(UpdateProductVM.SizeIds), "Sizes are incorrect");
+                    return View(productVM);
+                }
+            }
+            else
+            {
+                productVM.SizeIds = new();
+            }
+
+            _context.ProductSizes.RemoveRange(productFromSQL.ProductSizes.Where(x => !productVM.SizeIds.Exists(xr => xr == x.SizeId)));
+            _context.ProductSizes.AddRange(productVM.SizeIds.Where(x => !productFromSQL.ProductSizes.Exists(xd => xd.SizeId == x)).ToList().Select(xz => new ProductSize { SizeId = xz, ProductId = productFromSQL.Id }));
+
+            _context.ProductColors.RemoveRange(productFromSQL.ProductColors.Where(x => !productVM.ColorIds.Exists(xr => xr == x.ColorId)));
+            _context.ProductColors.AddRange(productVM.ColorIds.Where(x => !productFromSQL.ProductColors.Exists(xd => xd.ColorId == x)).ToList().Select(xz => new ProductColor { ColorId = xz, ProductId = productFromSQL.Id }));
 
 
             _context.ProductTags.RemoveRange(productFromSQL.ProductTags.Where(x => !productVM.TagIds.Exists(xr => xr == x.TagId)));

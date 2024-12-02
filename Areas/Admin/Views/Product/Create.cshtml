@@ -66,7 +66,18 @@
                         </select>
                         <span asp-validation-for="TagIds" class="text-danger"></span>
                     </div>
-
+                    <div class="form-group">
+                        <label asp-for="ColorIds">Colors</label>
+                        <select asp-for="ColorIds" class="form-control" asp-items="new SelectList(Model.Colors,nameof(Color.Id),nameof(Color.Name))" multiple>
+                        </select>
+                        <span asp-validation-for="ColorIds" class="text-danger"></span>
+                    </div>
+                    <div class="form-group">
+                        <label asp-for="SizeIds">Sizes</label>
+                        <select asp-for="SizeIds" class="form-control" asp-items="new SelectList(Model.Sizes,nameof(Size.Id),nameof(Size.Name))" multiple>
+                        </select>
+                        <span asp-validation-for="SizeIds" class="text-danger"></span>
+                    </div> 
                     <button type="submit" class="btn btn-primary me-2">Create</button>
                     <button class="btn btn-light">Cancel</button>
                 </form>

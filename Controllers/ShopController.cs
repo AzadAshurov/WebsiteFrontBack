@@ -26,6 +26,8 @@ namespace WebApplication1.Controllers
                 .Include(p => p.ProductImages.OrderByDescending(pi => pi.IsPrimary))
                 .Include(p => p.Category)
                 .Include(p => p.ProductTags).ThenInclude(t => t.Tag)
+                .Include(p => p.ProductSizes).ThenInclude(t => t.Size)
+                .Include(p => p.ProductColors).ThenInclude(t => t.Color)
                 .FirstOrDefaultAsync(p => p.Id == id);
 
             if (product is null) return NotFound();
