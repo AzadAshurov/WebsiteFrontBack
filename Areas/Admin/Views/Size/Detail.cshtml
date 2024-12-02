@@ -1,0 +1,38 @@
+﻿@using WebApplication1.Areas.Admin.ViewModels.Sizes
+@model DetailSizeVM
+
+<div class="row">
+
+    <div class="col-12 grid-margin stretch-card">
+        <div class="card">
+            <div class="card-body">
+                <h4 class="card-title">Size Details</h4>
+
+                <div class="form-group">
+                    <label for="Name" class="form-label">Name</label>
+                    <input asp-for="Name" class="form-control" placeholder="Name" readonly>
+                </div>
+
+                <div class="form-group">
+                    <label for="IsDeleted" class="form-label">Status</label>
+                    <p class="form-control-plaintext">
+                        @(Model.IsDeleted ? "Size is deleted" : "Size is not deleted")
+                    </p>
+                </div>
+
+                <div class="form-group">
+                    <label for="CreatedAt" class="form-label">Created At</label>
+                    <input asp-for="CreatedAt" class="form-control" placeholder="Created At" readonly>
+                </div>
+
+                <div class="form-group">
+                    <label for="ProductSizesCount" class="form-label">Number of Products</label>
+                    <input type="text" class="form-control" value="@Model.ProductSizes?.Count" placeholder="Number of Products" readonly>
+                </div>
+
+                <a asp-area="Admin" asp-controller="Size" asp-action="Index" class="btn btn-light">Back</a>
+            </div>
+        </div>
+    </div>
+
+</div>
