@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using WebApplication1.Areas.Admin.ViewModels.Categoryes;
 using WebApplication1.DAL;
 using WebApplication1.Models;
 
@@ -16,7 +17,7 @@ namespace WebApplication1.Areas.Admin.Controllers
         }
         public async Task<IActionResult> Index()
         {
-            List<Category> categories = await _context.Category.Include(x => x.Product).ToListAsync();
+            List<GetCategoryAdminVM> categories = await _context.Category.Include(w => w.Product).Select(x => new GetCategoryAdminVM { Id = x.Id, Name = x.Name, ProductCount = x.Product.Count }).ToListAsync();
             return View(categories);
         }
         [HttpGet]
@@ -26,7 +27,7 @@ namespace WebApplication1.Areas.Admin.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> Create(Category category)
+        public async Task<IActionResult> Create(CreateCategoryVM category)
         {
             if (!ModelState.IsValid)
             {
@@ -40,26 +41,35 @@ namespace WebApplication1.Areas.Admin.Controllers
                 ModelState.AddModelError("Name", "This category already exists");
                 return View();
             }
+            Category category1 = new()
+            {
+                CreatedAt = DateTime.Now,
+                IsDeleted = false,
+                Name = category.Name
+            };
 
-            category.CreatedAt = DateTime.Now;
-            await _context.Category.AddAsync(category);
+            await _context.Category.AddAsync(category1);
             await _context.SaveChangesAsync();
-            Console.WriteLine("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA");
             return RedirectToAction(nameof(Index));
         }
 
         public async Task<IActionResult> Update(int? id)
         {
             if (id == null || id < 1) return BadRequest();
-
-            Category category = await _context.Category.FirstOrDefaultAsync(c => c.Id == id);
+            CategoryUpdateVM category = await _context.Category.Where(x => x.Id == id).Select(x => new CategoryUpdateVM
+            {
+                Id = x.Id,
+                Name = x.Name,
+                CreatedAt = x.CreatedAt,
+                IsDeleted = x.IsDeleted
+            }).FirstOrDefaultAsync();
 
             if (category is null) return NotFound();
 
             return View(category);
         }
         [HttpPost]
-        public async Task<IActionResult> Update(int? id, Category category)
+        public async Task<IActionResult> Update(int? id, CategoryUpdateVM category)
         {
             if (id == null || id < 1) return BadRequest();
 

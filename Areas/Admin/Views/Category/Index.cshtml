@@ -1,4 +1,5 @@
-﻿@model List<Category>
+﻿@using WebApplication1.Areas.Admin.ViewModels.Categoryes
+@model List<GetCategoryAdminVM>
 
 @{
     int count = 0;
@@ -33,7 +34,7 @@
                         </thead>
                         <tbody>
 
-                            @foreach (Category category in Model)
+                            @foreach (GetCategoryAdminVM category in Model)
                             {
                                 count++;
                                 <tr>
@@ -44,7 +45,7 @@
                                         @category.Name
                                     </td>
                                     <td>
-                                        @category.Product.Count
+                                        @category.ProductCount
                                     </td>
                                     <td>
                                         <a asp-action="update" asp-route-id="@category.Id" class="btn btn-warning"><i class="mdi mdi-grease-pencil"></i></a>
