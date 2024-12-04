@@ -1,4 +1,6 @@
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using WebApplication1.Areas.Admin.Models;
 using WebApplication1.DAL;
 
 namespace WebApplication1
@@ -13,7 +15,21 @@ namespace WebApplication1
             builder.Services.AddControllersWithViews();
             builder.Services.AddDbContext<AppDbContext>(opt =>
             opt.UseSqlServer(builder.Configuration.GetConnectionString("Default")));
+            builder.Services.AddIdentity<AppUser, IdentityRole>(opt =>
+            {
+                opt.Password.RequiredLength = 8;
+                opt.Password.RequireNonAlphanumeric = false;
+                //opt.User.AllowedUserNameCharacters = "qwertyuiopasdfghjklzxcvbnm";
+                opt.User.RequireUniqueEmail = true;
+                opt.Lockout.AllowedForNewUsers = true;
+                opt.Lockout.MaxFailedAccessAttempts = 4;
+                opt.Lockout.DefaultLockoutTimeSpan = TimeSpan.FromHours(72);
+            }).AddEntityFrameworkStores<AppDbContext>().AddDefaultTokenProviders();
+
+
             var app = builder.Build();
+            app.UseAuthentication();
+            app.UseAuthorization();
             app.UseStaticFiles();
             app.MapControllerRoute(
                name: "admin",
