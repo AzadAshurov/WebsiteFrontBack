@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using WebApplication1.Areas.Admin.ViewModels;
 using WebApplication1.Areas.Admin.ViewModels.Products;
@@ -10,6 +11,7 @@ using WebApplication1.Utilities.Extensions;
 namespace WebApplication1.Areas.Admin.Controllers
 {
     [Area("Admin")]
+    [Authorize(Roles = "Admin,Moderator")]
     public class ProductController : Controller
     {
         private readonly AppDbContext _context;
@@ -38,6 +40,7 @@ namespace WebApplication1.Areas.Admin.Controllers
 
             return View(productsVMs);
         }
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Create()
         {
             CreateProductVM productVM = new CreateProductVM

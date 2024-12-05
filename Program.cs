@@ -23,7 +23,7 @@ namespace WebApplication1
                 opt.User.RequireUniqueEmail = true;
                 opt.Lockout.AllowedForNewUsers = true;
                 opt.Lockout.MaxFailedAccessAttempts = 4;
-                opt.Lockout.DefaultLockoutTimeSpan = TimeSpan.FromHours(72);
+                opt.Lockout.DefaultLockoutTimeSpan = TimeSpan.FromSeconds(100);
             }).AddEntityFrameworkStores<AppDbContext>().AddDefaultTokenProviders();
 
 
