@@ -12,8 +12,8 @@ using WebApplication1.DAL;
 namespace WebApplication1.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20241211060655_test")]
-    partial class test
+    [Migration("20241211065419_setAdded")]
+    partial class setAdded
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
