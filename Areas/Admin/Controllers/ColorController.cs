@@ -9,6 +9,7 @@ namespace WebApplication1.Areas.Admin.Controllers
 {
     [Area("Admin")]
     [Authorize(Roles = "Admin,Moderator")]
+    [AutoValidateAntiforgeryToken]
     public class ColorController : Controller
     {
         private readonly AppDbContext _context;
