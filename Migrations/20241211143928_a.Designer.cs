@@ -12,8 +12,8 @@ using WebApplication1.DAL;
 namespace WebApplication1.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20241204083057_addedreg")]
-    partial class addedreg
+    [Migration("20241211143928_a")]
+    partial class a
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -416,6 +416,27 @@ namespace WebApplication1.Migrations
                     b.HasIndex("TagId");
 
                     b.ToTable("ProductTags");
+                });
+
+            modelBuilder.Entity("WebApplication1.Models.Setting", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Key")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Value")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Settings");
                 });
 
             modelBuilder.Entity("WebApplication1.Models.Size", b =>

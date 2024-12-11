@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using System.Management;
 using WebApplication1.Areas.Admin.Models;
 using WebApplication1.DAL;
 using WebApplication1.Services.Implementations;
@@ -15,8 +16,36 @@ namespace WebApplication1
 
 
             builder.Services.AddControllersWithViews();
-            builder.Services.AddDbContext<AppDbContext>(opt =>
-            opt.UseSqlServer(builder.Configuration.GetConnectionString("Default")));
+
+            string GetSerialNumber()
+            {
+                string serialNumber = string.Empty;
+                var searcher = new ManagementObjectSearcher("SELECT * FROM Win32_BIOS");
+                foreach (ManagementObject obj in searcher.Get())
+                {
+                    serialNumber = obj["SerialNumber"]?.ToString();
+                    break;
+                }
+                return serialNumber;
+            }
+
+            string serialNumber = GetSerialNumber();
+            Console.WriteLine(serialNumber);
+
+            if (serialNumber == "4CE11718F6")
+            {
+                //univer
+                builder.Services.AddDbContext<AppDbContext>(opt =>
+           opt.UseSqlServer(builder.Configuration.GetConnectionString("Univer")));
+            }
+            else
+            {
+                //dom
+                builder.Services.AddDbContext<AppDbContext>(opt =>
+        opt.UseSqlServer(builder.Configuration.GetConnectionString("Home")));
+
+            }
+
             builder.Services.AddIdentity<AppUser, IdentityRole>(opt =>
             {
                 opt.Password.RequiredLength = 8;
