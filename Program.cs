@@ -2,6 +2,8 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using WebApplication1.Areas.Admin.Models;
 using WebApplication1.DAL;
+using WebApplication1.Services.Implementations;
+using WebApplication1.Services.Interfaces;
 
 namespace WebApplication1
 {
@@ -25,6 +27,7 @@ namespace WebApplication1
                 opt.Lockout.MaxFailedAccessAttempts = 4;
                 opt.Lockout.DefaultLockoutTimeSpan = TimeSpan.FromSeconds(100);
             }).AddEntityFrameworkStores<AppDbContext>().AddDefaultTokenProviders();
+            builder.Services.AddScoped<ILayoutService, LayoutService>();
 
 
             var app = builder.Build();
