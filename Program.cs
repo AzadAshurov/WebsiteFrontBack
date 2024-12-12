@@ -57,8 +57,7 @@ namespace WebApplication1
                 opt.Lockout.DefaultLockoutTimeSpan = TimeSpan.FromSeconds(100);
             }).AddEntityFrameworkStores<AppDbContext>().AddDefaultTokenProviders();
             builder.Services.AddScoped<ILayoutService, LayoutService>();
-
-
+            builder.Services.AddHttpContextAccessor();
             var app = builder.Build();
             app.UseAuthentication();
             app.UseAuthorization();
