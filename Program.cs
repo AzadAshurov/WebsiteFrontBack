@@ -1,6 +1,6 @@
+using System.Management;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
-using System.Management;
 using WebApplication1.Areas.Admin.Models;
 using WebApplication1.DAL;
 using WebApplication1.Services.Implementations;
