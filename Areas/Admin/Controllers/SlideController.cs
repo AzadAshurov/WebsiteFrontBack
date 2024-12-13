@@ -1,5 +1,4 @@
-﻿using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using WebApplication1.DAL;
 using WebApplication1.Models;
@@ -9,7 +8,7 @@ using WebApplication1.Utilities.Extensions;
 namespace WebApplication1.Areas.Admin.Controllers
 {
     [Area("Admin")]
-    [Authorize(Roles = "Admin,Moderator")]
+    // [Authorize(Roles = "Admin,Moderator")]
     [AutoValidateAntiforgeryToken]
     public class SlideController : Controller
     {
