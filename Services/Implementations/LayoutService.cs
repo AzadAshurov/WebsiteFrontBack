@@ -41,6 +41,7 @@ namespace WebApplication1.Services.Implementations
                            Id = bi.ProductId
                        })
                        .ToList();
+                    Console.WriteLine("NOTNULL");
                 }
             }
             else
