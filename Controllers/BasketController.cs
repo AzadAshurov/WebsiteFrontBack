@@ -220,7 +220,77 @@ namespace WebApplication1.Controllers
 
             return RedirectToAction("Index", "Basket");
         }
+        [HttpPost]
+        public async Task<IActionResult> ChangeItemQuantity(int? id, string change)
+        {
 
+
+            int changeInt = Convert.ToInt32(change);
+            if (id == null || id < 1) return BadRequest();
+            if (changeInt != 1 && changeInt != -1) return BadRequest();
+
+
+            bool result = await _context.Products.AnyAsync(p => p.Id == id);
+            if (!result) return NotFound();
+
+
+            if (User.Identity.IsAuthenticated)
+            {
+
+
+
+                AppUser? user = await _userManager.Users
+                    .Include(u => u.BasketItems)
+                    .FirstOrDefaultAsync(u => u.Id == User.FindFirstValue(ClaimTypes.NameIdentifier));
+
+
+                BasketItem item = user.BasketItems.FirstOrDefault(bi => bi.ProductId == id);
+                if (item is null)
+                {
+                    return NotFound();
+                }
+                else
+                {
+                    item.Count += changeInt;
+                    if (item.Count == 0) item.Count++;
+
+                }
+                await _context.SaveChangesAsync();
+            }
+            else
+            {
+                List<BasketCookieItemVM> basket;
+
+                string cookies = Request.Cookies["basket"];
+                if (cookies != null)
+                {
+                    basket = JsonConvert.DeserializeObject<List<BasketCookieItemVM>>(cookies);
+
+                    BasketCookieItemVM existed = basket.FirstOrDefault(b => b.Id == id);
+                    if (existed != null)
+                    {
+                        existed.Count += changeInt;
+                        if (existed.Count == 0) existed.Count++;
+                    }
+                    else
+                    {
+                        return NotFound();
+                    }
+
+                }
+                else
+                {
+                    return NotFound();
+                }
+                string json = JsonConvert.SerializeObject(basket);
+
+                Response.Cookies.Append("basket", json);
+
+            }
+
+            return RedirectToAction("Index", "Basket");
+
+        }
 
     }
 }

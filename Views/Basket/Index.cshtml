@@ -69,17 +69,23 @@
                                             </td>
                                             <td class="quantity">
                                                 <div class="cart-plus-minus">
-                                                    <input class="cart-plus-minus-box"
-                                                           value="@itemVM.Count"
-                                                           type="text" />
-                                                    <div class="dec qtybutton">
-                                                        <i class="fa fa-minus"></i>
-                                                    </div>
-                                                    <div class="inc qtybutton">
-                                                        <i class="fa fa-plus"></i>
-                                                    </div>
+                                                    <form asp-action="ChangeItemQuantity" asp-controller="Basket" method="post">
+                                                        <input type="hidden" name="id" value="@itemVM.Id" />
+                                                        <button type="submit" name="change" value="-1" class="dec qtybutton">
+                                                            <i class="fa fa-minus"></i>
+                                                        </button>
+                                                        <input class="cart-plus-minus-box"
+                                                               value="@itemVM.Count"
+                                                               type="text"
+                                                               readonly />
+                                                        <button type="submit" name="change" value="1" class="inc qtybutton">
+                                                            <i class="fa fa-plus"></i>
+                                                        </button>
+                                                    </form>
                                                 </div>
                                             </td>
+
+
                                             <td class="product-subtotal">
                                                 <span class="amount">$@itemVM.SubTotal</span>
                                             </td>
