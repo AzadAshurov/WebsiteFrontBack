@@ -92,10 +92,7 @@ namespace WebApplication1.Controllers
             if (User.Identity.IsAuthenticated)
             {
 
-                //AppUser user=await _userManager.FindByNameAsync(User.Identity.Name);
-                //AppUser? user = await _userManager.Users
-                //    .Include(u => u.BasketItems)
-                //    .FirstOrDefaultAsync(u => u.UserName == User.Identity.Name);
+
 
                 AppUser? user = await _userManager.Users
                     .Include(u => u.BasketItems)
@@ -166,5 +163,64 @@ namespace WebApplication1.Controllers
         {
             return Content(Request.Cookies["basket"]);
         }
+        public async Task<IActionResult> DeleteItemFromBasket(int? id)
+        {
+            if (id == null || id < 1) return BadRequest();
+
+            bool result = await _context.Products.AnyAsync(p => p.Id == id);
+            if (!result) return NotFound();
+            if (User.Identity.IsAuthenticated)
+            {
+                AppUser? user = await _userManager.Users
+                    .Include(u => u.BasketItems)
+                    .FirstOrDefaultAsync(u => u.Id == User.FindFirstValue(ClaimTypes.NameIdentifier));
+
+
+                BasketItem item = user.BasketItems.FirstOrDefault(bi => bi.ProductId == id);
+                if (item is not null)
+                {
+                    user.BasketItems.Remove(item);
+                }
+                else
+                {
+                    return NotFound();
+                }
+                await _context.SaveChangesAsync();
+            }
+            else
+            {
+                List<BasketCookieItemVM> basket;
+
+                string cookies = Request.Cookies["basket"];
+                if (cookies != null)
+                {
+                    basket = JsonConvert.DeserializeObject<List<BasketCookieItemVM>>(cookies);
+
+                    BasketCookieItemVM existed = basket.FirstOrDefault(b => b.Id == id);
+                    if (existed != null)
+                    {
+                        basket.Remove(existed);
+                    }
+                    else
+                    {
+                        //throw new Exception("Non existed id deleted");
+                        return NotFound();
+                    }
+
+                }
+                else
+                {
+                    return BadRequest();
+                }
+                string json = JsonConvert.SerializeObject(basket);
+
+                Response.Cookies.Append("basket", json);
+            }
+
+
+            return RedirectToAction("Index", "Basket");
+        }
+
+
     }
 }
