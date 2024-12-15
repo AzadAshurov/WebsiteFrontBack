@@ -252,7 +252,7 @@ namespace WebApplication1.Migrations
 
                     b.HasIndex("ProductId");
 
-                    b.ToTable("BasketItem");
+                    b.ToTable("BasketItems");
                 });
 
             modelBuilder.Entity("WebApplication1.Models.Category", b =>
