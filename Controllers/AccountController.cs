@@ -49,7 +49,7 @@ namespace WebApplication1.Controllers
                 }
             }
             //all new users are admin, this is only for test
-            await _userManager.AddToRoleAsync(user, UserRole.Admin.ToString());
+            await _userManager.AddToRoleAsync(user, UserRole.Member.ToString());
             await _signInManager.SignInAsync(user, false);
             return RedirectToAction(nameof(HomeController.Index), "Home");
         }

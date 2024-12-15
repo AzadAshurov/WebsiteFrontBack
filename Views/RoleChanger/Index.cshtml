@@ -1,0 +1,19 @@
+﻿@model RoleGetVM
+<div class="row">
+    <div class="col-12 grid-margin stretch-card">
+        <div class="card">
+            <div class="card-body">
+
+                <form class="forms-sample" asp-controller="RoleChanger" asp-action="ChangeRole" method="post" enctype="multipart/form-data">
+                    <div class="form-group">
+                        <label for="KeyFile" class="form-label">Upload Key</label>
+                        <input type="file" name="KeyFile" class="form-control" accept=".txt" required>
+                        <span asp-validation-for="KeyFile" class="text-danger"></span>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary me-2">Submit</button>
+                </form>
+                </div>
+        </div>
+    </div>
+</div>

@@ -1,9 +1,10 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 
 namespace WebApplication1.Areas.Admin.Controllers
 {
     [Area("Admin")]
-    //[Authorize(Roles = "Admin,Moderator")]
+    [Authorize(Roles = "Admin,Moderator")]
     [AutoValidateAntiforgeryToken]
     public class HomeController : Controller
     {

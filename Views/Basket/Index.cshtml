@@ -69,7 +69,7 @@
                                             </td>
                                             <td class="quantity">
                                                 <div class="cart-plus-minus">
-                                                    <form asp-action="ChangeItemQuantity" asp-controller="Basket" method="post">
+                                                    <form asp-action="ChangeItemQuantity" asp-controller="basket" method="post">
                                                         <input type="hidden" name="id" value="@itemVM.Id" />
                                                         <button type="submit" name="change" value="-1" class="dec qtybutton">
                                                             <i class="fa fa-minus"></i>
