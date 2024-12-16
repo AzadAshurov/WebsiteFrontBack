@@ -1,5 +1,8 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using WebApplication1.Areas.Admin.ViewModels.Orders;
+using WebApplication1.DAL;
 
 namespace WebApplication1.Areas.Admin.Controllers
 {
@@ -8,9 +11,31 @@ namespace WebApplication1.Areas.Admin.Controllers
     [AutoValidateAntiforgeryToken]
     public class HomeController : Controller
     {
-        public IActionResult Index()
+        private readonly AppDbContext _context;
+
+        public HomeController(AppDbContext context)
         {
-            return View();
+            _context = context;
+        }
+        public async Task<IActionResult> Index()
+        {
+            List<ShowOrderVM> showOrdersVM = await _context.Orders
+         .Include(o => o.OrderItems)
+         .Include(o => o.AppUser)
+         .Select(o => new ShowOrderVM
+         {
+             Address = o.Address,
+             TotalPrice = o.OrderItems.Sum(oi => oi.Price * oi.Count),
+             AppUserId = o.AppUserId,
+             AppUser = o.AppUser,
+             OrderItems = o.OrderItems.ToList(),
+             Status = o.Status,
+             CreatedAt = o.CreatedAt
+         })
+         .ToListAsync();
+
+
+            return View(showOrdersVM);
         }
         [HttpPost]
         public IActionResult Index(string name)
