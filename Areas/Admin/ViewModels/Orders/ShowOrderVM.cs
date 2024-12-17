@@ -1,7 +1,7 @@
 ﻿using WebApplication1.Areas.Admin.Models;
 using WebApplication1.Models;
 
-namespace WebApplication1.Areas.Admin.ViewModels.Orders
+namespace WebApplication1.Areas.Admin
 {
     public class ShowOrderVM
     {

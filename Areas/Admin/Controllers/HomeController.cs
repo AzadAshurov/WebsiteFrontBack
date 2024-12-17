@@ -1,7 +1,6 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using WebApplication1.Areas.Admin.ViewModels.Orders;
 using WebApplication1.DAL;
 
 namespace WebApplication1.Areas.Admin.Controllers
