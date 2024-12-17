@@ -2,6 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using WebApplication1.Areas.Admin.ViewModels;
 using WebApplication1.Areas.Admin.ViewModels.Products;
+using WebApplication1.Areas.Admin.ViewModels.Universal;
 using WebApplication1.DAL;
 using WebApplication1.Models;
 using WebApplication1.Utilities.Enums;
@@ -23,22 +24,36 @@ namespace WebApplication1.Areas.Admin.Controllers
             _env = env;
         }
 
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(int page = 1)
         {
-            List<GetProductAdminVM> productsVMs = await _context.Products
-                .Include(p => p.Category)
-                .Include(p => p.ProductImages.Where(pi => pi.IsPrimary == true))
-                .Select(p => new GetProductAdminVM
-                {
-                    Id = p.Id,
-                    Name = p.Name,
-                    Price = p.Price,
-                    CategoryName = p.Category.Name,
-                    Image = p.ProductImages[0].Image
-                })
-                .ToListAsync();
+            if (page < 1) return BadRequest();
 
-            return View(productsVMs);
+            int count = await _context.Products.CountAsync();
+            double total = Math.Ceiling((double)count / 5);
+
+            if (page > total) return BadRequest();
+
+            PaginatedVM<GetProductAdminVM> paginatedVM = new()
+            {
+                TotalPage = total,
+                CurrentPage = page,
+                Items = await _context.Products
+                    .Skip((page - 1) * 5)
+                    .Take(5)
+                    .Include(p => p.Category)
+                    .Include(p => p.ProductImages)
+                    .Select(p => new GetProductAdminVM
+                    {
+                        Id = p.Id,
+                        Name = p.Name,
+                        Price = p.Price,
+                        CategoryName = p.Category.Name,
+                        Image = p.ProductImages.FirstOrDefault(p => p.IsPrimary == true).Image
+                    })
+                    .ToListAsync()
+            };
+
+            return View(paginatedVM);
         }
         // [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Create()

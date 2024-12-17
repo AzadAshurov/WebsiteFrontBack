@@ -1,4 +1,5 @@
-﻿@model List<GetProductAdminVM>
+﻿@using WebApplication1.Areas.Admin.ViewModels.Universal
+@model PaginatedVM<GetProductAdminVM>
 
 @{
     int count = 0;
@@ -39,7 +40,7 @@
                         </thead>
                         <tbody>
 
-                            @foreach (GetProductAdminVM product in Model)
+                            @foreach (GetProductAdminVM product in Model.Items)
                             {
                                 count++;
                                 <tr>
@@ -70,6 +71,25 @@
 
                         </tbody>
                     </table>
+                    <nav aria-label="Page navigation example">
+                        <ul class="pagination">
+                    
+                            <li class="page-item @(ViewBag.CurrentPage <= 1 ? "disabled" : "")">
+                                <a class="page-link" asp-action="index" asp-route-page="@(ViewBag.CurrentPage - 1)">Previous</a>
+                            </li>
+
+                            @for (int i = 1; i <= ViewBag.TotalPage; i++)
+                            {
+                                <li class="page-item @(ViewBag.CurrentPage == i ? "active" : "")">
+                                    <a class="page-link" asp-action="index" asp-route-page="@i">@i</a>
+                                </li>
+                            }
+
+                            <li class="page-item @(ViewBag.TotalPage == ViewBag.CurrentPage ? "disabled" : "")">
+                                <a class="page-link" asp-action="index" asp-route-page="@(ViewBag.CurrentPage + 1)">Next</a>
+                            </li>
+                        </ul>
+                    </nav>
                 </div>
             </div>
         </div>
