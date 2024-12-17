@@ -2,7 +2,6 @@
 using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
 using WebApplication1.DAL;
-using WebApplication1.Models;
 using WebApplication1.Services.Interfaces;
 using WebApplication1.ViewModels;
 
@@ -49,25 +48,22 @@ namespace WebApplication1.Services.Implementations
                     return basketVM;
                 }
                 cookiesVM = JsonConvert.DeserializeObject<List<BasketCookieItemVM>>(cookie);
-                foreach (BasketCookieItemVM item in cookiesVM)
-                {
-                    Product product = await _context.Products
-                        .Include(p => p.ProductImages.Where(pi => pi.IsPrimary == true))
-                        .FirstOrDefaultAsync(p => p.Id == item.Id);
+                cookiesVM = JsonConvert.DeserializeObject<List<BasketCookieItemVM>>(cookie);
 
-                    if (product != null)
+                basketVM = await _context.Products.Where(p => cookiesVM.Select(c => c.Id).Contains(p.Id))
+                    .Select(p => new BasketItemVM
                     {
-                        basketVM.Add(new BasketItemVM
-                        {
-                            Id = product.Id,
-                            Name = product.Name,
-                            Image = product.ProductImages[0].Image,
-                            Price = product.Price,
-                            Count = item.Count,
-                            SubTotal = item.Count * product.Price
-                        });
-                    }
-                }
+                        Id = p.Id,
+                        Name = p.Name,
+                        Image = p.ProductImages[0].Image,
+                        Price = p.Price,
+                    }).ToListAsync();
+
+                basketVM.ForEach(bi =>
+                {
+                    bi.Count = cookiesVM.FirstOrDefault(c => c.Id == bi.Id).Count;
+                    bi.SubTotal = bi.Price * bi.Count;
+                });
             }
             return basketVM;
         }
