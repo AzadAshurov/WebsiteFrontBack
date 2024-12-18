@@ -48,8 +48,6 @@ namespace WebApplication1.Services.Implementations
                     return basketVM;
                 }
                 cookiesVM = JsonConvert.DeserializeObject<List<BasketCookieItemVM>>(cookie);
-                cookiesVM = JsonConvert.DeserializeObject<List<BasketCookieItemVM>>(cookie);
-
                 basketVM = await _context.Products.Where(p => cookiesVM.Select(c => c.Id).Contains(p.Id))
                     .Select(p => new BasketItemVM
                     {

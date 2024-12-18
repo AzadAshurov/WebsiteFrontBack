@@ -2,6 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using WebApplication1.DAL;
 using WebApplication1.Models;
+using WebApplication1.Utilities.Enums;
 using WebApplication1.ViewModels;
 
 namespace WebApplication1.Controllers
@@ -14,9 +15,65 @@ namespace WebApplication1.Controllers
         {
             _context = context;
         }
-        public IActionResult Index(int id)
+        public async Task<IActionResult> Index(string? search, int? categoryId, int key = 1, int page = 1)
         {
-            return View();
+            IQueryable<Product> query = _context.Products.Include(p => p.ProductImages.Where(pi => pi.IsPrimary != null));
+            if (!string.IsNullOrEmpty(search))
+            {
+                query = query.Where(p => p.Name.ToLower().Contains(search.ToLower()));
+            }
+            if (categoryId != null && categoryId > 0)
+            {
+                query = query.Where(pi => pi.CategoryId == categoryId);
+            };
+            switch (key)
+            {
+                case (int)SortType.Name:
+                    query = query.OrderBy(p => p.Name);
+                    break;
+
+                case (int)SortType.Price:
+                    query = query.OrderByDescending(p => p.Price);
+                    break;
+
+                case (int)SortType.Date:
+                    query = query.OrderBy(p => p.CreatedAt);
+                    break;
+            }
+            int count = query.Count();
+            double totalPage = Math.Ceiling((double)count / 3);
+
+            query = query.Skip((page - 1) * 3).Take(3);
+
+
+            ShopVM shopVM = new ShopVM
+            {
+                Products = await query.Select(p => new GetProductVM
+                {
+                    Id = p.Id,
+                    Name = p.Name,
+                    Image = p.ProductImages.FirstOrDefault(pi => pi.IsPrimary == true).Image,
+                    HoverImage = p.ProductImages.FirstOrDefault(pi => pi.IsPrimary == false).Image,
+                    Price = p.Price,
+                }).ToListAsync(),
+
+                Categories = await _context.Category.Select(c => new GetCategoryVM
+                {
+                    Id = c.Id,
+                    Name = c.Name,
+                    Count = c.Product.Count
+                }).ToListAsync(),
+
+                Search = search,
+                CategoryId = categoryId,
+                Key = key,
+                TotalPage = totalPage,
+                CurrentPage = page
+            };
+
+
+
+            return View(shopVM);
         }
         public async Task<IActionResult> Detail(int? id)
         {
