@@ -18,7 +18,7 @@
             }
             catch (Exception e)
             {
-                context.Response.Redirect($"/Error/Error?errorMessage={e.Message}");
+                context.Response.Redirect($"/Error/error?errorMessage={e.Message}");
             }
         }
     }

@@ -1,8 +1,9 @@
-using System.Management;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using System.Management;
 using WebApplication1.Areas.Admin.Models;
 using WebApplication1.DAL;
+using WebApplication1.Middlewares;
 using WebApplication1.Services.Implementations;
 using WebApplication1.Services.Interfaces;
 
@@ -63,7 +64,7 @@ namespace WebApplication1
             app.UseAuthentication();
             app.UseAuthorization();
             app.UseStaticFiles();
-            //app.UseMiddleware<GlobalExceptionHandlerMiddleware>();
+            app.UseMiddleware<GlobalExceptionHandlerMiddleware>();
             app.MapControllerRoute(
                name: "admin",
                pattern: "{area:exists}/{controller=Home}/{action=Index}/{id?}"

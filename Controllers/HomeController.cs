@@ -16,6 +16,7 @@ namespace WebApplication1.Controllers
 
         public async Task<IActionResult> Index(int id)
         {
+            throw new NotImplementedException("Salam xeta");
             var slides = await _context.Slides.OrderBy(x => x.Order).Take(3).ToListAsync();
             var products = await _context.Products.Include(p => p.ProductImages.Where(pi => pi.IsPrimary != null)).ToListAsync();
             var newProducts = await _context.Products

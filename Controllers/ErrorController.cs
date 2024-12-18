@@ -6,7 +6,7 @@ namespace WebApplication1.Controllers
     {
         public IActionResult Error(string errorMessage)
         {
-            return View(model: errorMessage);
+            return View("Error", model: errorMessage);
         }
     }
 }
